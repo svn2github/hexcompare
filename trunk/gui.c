@@ -743,9 +743,16 @@ void start_gui(struct file file_one, struct file file_two,
 	                block_cache, total_blocks, offset_index, display);
 
 	/* Wait for user-keypresses and react accordingly. */
-	while((key_pressed = wgetch(main_window)) != 'q')
+	for(;;)
 	{
 		int rows;
+
+		/* poll the next keypress event from curses */
+		key_pressed = wgetch(main_window);
+
+		/* if we got 'q' or ESC, then quit */
+		if ((key_pressed == 'q') || (key_pressed == 27)) break;
+
 		if (mode == OVERVIEW_MODE) rows = 5; else rows = height - 5;
 
 		switch(key_pressed)
