@@ -22,8 +22,11 @@ int main(int argc, char **argv)
 
 	/* Load in the file names. */
 	file_one.name = argv[1];
-	if (argc == 2) file_two.name = argv[1];
-	else file_two.name = argv[2];
+	if (argc == 2) {
+		file_two.name = argv[1];
+	} else {
+		file_two.name = argv[2];
+	}
 
 	/* Open the files.
 	   Present the user with an error message if they cannot be opened. */

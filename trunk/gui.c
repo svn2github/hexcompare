@@ -152,15 +152,17 @@ static void generate_titlebar(struct file file_one, struct file file_two,
 	/* Write bottom menu options. */
 	strcpy(bottom_message, "Quit: q | ");
 
-	if (display == HEX_VIEW)
+	if (display == HEX_VIEW) {
 		strcat(bottom_message, "Hex Mode: m | ");
-	else
+	} else {
 		strcat(bottom_message, "ASCII Mode: m | ");
+	}
 
-	if (mode == OVERVIEW_MODE)
+	if (mode == OVERVIEW_MODE) {
 		strcat(bottom_message, "Full View: v | Page & Arrow Keys to Move");
-	else
+	} else {
 		strcat(bottom_message, "Mixed View: v | Arrow Keys to Move");
+	}
 
 	mvprintw(height-1, SIDE_MARGIN, "%s", bottom_message);
 
@@ -203,10 +205,11 @@ static char *generate_blocks(struct file file_one, struct file file_two,
 		size_t bytes_in_block, j;
 
 		/* Calculate how many bytes to read for this block. */
-		if (i < blocks_with_excess_byte)
+		if (i < blocks_with_excess_byte) {
 			bytes_in_block = bytes_per_block + 1;
-		else
+		} else {
 			bytes_in_block = bytes_per_block;
+		}
 
 		/* Set the default. */
 		block_cache[i] = BLOCK_SAME;
@@ -272,8 +275,11 @@ static unsigned long *generate_offsets(unsigned long *offset_index,
 	/* Generate offset data. */
 	for (i = 0; i < total_blocks; i++) {
 		offset_index[i] = offset;
-		if (i < blocks_with_excess_byte) offset += bytes_per_block + 1;
-		else offset += bytes_per_block;
+		if (i < blocks_with_excess_byte) {
+			offset += bytes_per_block + 1;
+		} else {
+			offset += bytes_per_block;
+		}
 	}
 
 	return offset_index;
@@ -301,26 +307,26 @@ static unsigned long calculate_offset(unsigned long file_offset,
 	                                        offset_index);
 
 	/* Return the offset of the block we want. */
-	switch(shift_type) {
+	switch (shift_type) {
 		case LEFT_BLOCK:
-			if (current_block > 0)
-				current_block--;
+			if (current_block > 0) current_block--;
 			break;
 		case RIGHT_BLOCK:
-			if (current_block < total_blocks - 1)
-				current_block++;
+			if (current_block < total_blocks - 1) current_block++;
 			break;
 		case UP_ROW:
-			if (current_block - blocks_in_row < 0)
+			if (current_block - blocks_in_row < 0) {
 				current_block = 0;
-			else
+			} else {
 				current_block -= blocks_in_row;
+			}
 			break;
 		case DOWN_ROW:
-			if (current_block + blocks_in_row >= total_blocks)
+			if (current_block + blocks_in_row >= total_blocks) {
 				current_block = total_blocks - 1;
-			else
+			} else {
 				current_block += blocks_in_row;
+			}
 			break;
 		case UP_LINE:
 			if (file_offset - offset_jump > file_offset) {
@@ -330,10 +336,11 @@ static unsigned long calculate_offset(unsigned long file_offset,
 				return file_offset - offset_jump + 1;
 			}
 		case DOWN_LINE:
-			if (file_offset + offset_jump >= largest_file_size)
+			if (file_offset + offset_jump >= largest_file_size) {
 				return file_offset;
-			else
+			} else {
 				return file_offset + offset_jump - 1;
+			}
 	}
 
 	new_offset = offset_index[current_block];
@@ -422,7 +429,8 @@ static void draw_hex_data(int start_row, int finish_row, struct file file_one,
 			/* Convert binary to ASCII hex. */
 			sprintf(byte_one_hex, "%02x", byte_one);
 			sprintf(byte_two_hex, "%02x", byte_two);
-			byte_one_hex[2] = '\0'; byte_two_hex[2] = '\0';
+			byte_one_hex[2] = '\0';
+			byte_two_hex[2] = '\0';
 
 			/* Interpret ASCII version of bytes. */
 			byte_one_ascii = raw_to_ascii(byte_one);
@@ -435,11 +443,15 @@ static void draw_hex_data(int start_row, int finish_row, struct file file_one,
 
 			/* Byte 1:
 			   Determine if its EMPTY/DIFFERENT/SAME. */
-			if (bytes_read_one == 0) colour_pair = BLOCK_EMPTY;
-			else if (bytes_read_two == 0) colour_pair = BLOCK_DIFFERENT;
-			else if (strcmp(byte_one_hex,byte_two_hex) == 0)
-					colour_pair = BLOCK_SAME;
-			else colour_pair = BLOCK_DIFFERENT;
+			if (bytes_read_one == 0) {
+				colour_pair = BLOCK_EMPTY;
+			} else if (bytes_read_two == 0) {
+				colour_pair = BLOCK_DIFFERENT;
+			} else if (strcmp(byte_one_hex, byte_two_hex) == 0) {
+				colour_pair = BLOCK_SAME;
+			} else {
+				colour_pair = BLOCK_DIFFERENT;
+			}
 
 			/* Display the block. */
 			attron(COLOR_PAIR(colour_pair));
@@ -454,11 +466,15 @@ static void draw_hex_data(int start_row, int finish_row, struct file file_one,
 
 			/* Byte 2:
 			   Determine if its EMPTY/DIFFERENT/SAME. */
-			if (bytes_read_two == 0) colour_pair = BLOCK_EMPTY;
-			else if (bytes_read_one == 0) colour_pair = BLOCK_DIFFERENT;
-			else if (strcmp(byte_one_hex,byte_two_hex) == 0)
-					colour_pair = BLOCK_SAME;
-			else colour_pair = BLOCK_DIFFERENT;
+			if (bytes_read_two == 0) {
+				colour_pair = BLOCK_EMPTY;
+			} else if (bytes_read_one == 0) {
+				colour_pair = BLOCK_DIFFERENT;
+			} else if (strcmp(byte_one_hex,byte_two_hex) == 0) {
+				colour_pair = BLOCK_SAME;
+			} else {
+				colour_pair = BLOCK_DIFFERENT;
+			}
 
 			/* Display the block. */
 			attron(COLOR_PAIR(colour_pair));
