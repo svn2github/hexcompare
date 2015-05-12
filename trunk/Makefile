@@ -1,7 +1,7 @@
 all: hexcompare
 
 hexcompare: main.c gui.c
-	$(CC) $(CFLAGS) -o hexcompare main.c gui.c -lncurses -lm
+	$(CC) $(CFLAGS) -o hexcompare main.c gui.c -lncurses
 
 clean:
 	rm -f *.o
