@@ -4,7 +4,7 @@
    ##              ANCILLARY MATHEMATICAL FUNCTIONS                   ##
    ##################################################################### */
 
-void calculate_dimensions(int *width, int *height, int *total_blocks,
+static void calculate_dimensions(int *width, int *height, int *total_blocks,
                           unsigned long *bytes_per_block,
                           unsigned long largest_file_size,
                           int *blocks_with_excess_byte)
@@ -34,8 +34,8 @@ void calculate_dimensions(int *width, int *height, int *total_blocks,
 	return;
 }
 
-int calculate_current_block(int total_blocks, unsigned long file_offset,
-	                        unsigned long *offset_index)
+static int calculate_current_block(int total_blocks, unsigned long file_offset,
+                            unsigned long *offset_index)
 {
 	/* With a given offset, calculate which element it corresponds to
 	   in the offset_index. */
@@ -44,18 +44,21 @@ int calculate_current_block(int total_blocks, unsigned long file_offset,
 
 		/* Go block by block, and see if our offset is greater than
 		   that of the block's. */
-		if (file_offset >= offset_index[i]) current_block = i;
-		else break;
+		if (file_offset >= offset_index[i]) {
+			current_block = i;
+		} else {
+			break;
+		}
 
 		/* Break if we reach EOF. */
-		if (i+1 < total_blocks && offset_index[i+1] == offset_index[i])
+		if ((i+1 < total_blocks) && (offset_index[i+1] == offset_index[i]))
 		break;
 	}
 
 	return current_block;
 }
 
-int calculate_max_offset_characters(unsigned long file_offset,
+static int calculate_max_offset_characters(unsigned long file_offset,
                                     int width, int rows)
 {
 	/* Create variables. */
@@ -67,7 +70,7 @@ int calculate_max_offset_characters(unsigned long file_offset,
 
 	/* Endless loop until we figure out an offset size that is constant
 	   accross all rows. */
-	while (1) {
+	for (;;) {
 		unsigned int temp_offset = file_offset;
 
 		/* Calculate offset jump for a given offset_size */
@@ -104,17 +107,17 @@ int calculate_max_offset_characters(unsigned long file_offset,
    ##                    SCREEN HANDLING FUNCTIONS                    ##
    ##################################################################### */
 
-char raw_to_ascii(char input)
+static char raw_to_ascii(char input)
 {
-	if (input > 31 && input < 127) return input;
-	else return '.';
+	if ((input > 31) && (input < 127)) return input;
+	return '.';
 }
 
 /* #####################################################################
    ##                      HANDLE MOUSE ACTIONS                       ##
    ##################################################################### */
 
-void mouse_clicked(unsigned long *file_offset, unsigned long
+static void mouse_clicked(unsigned long *file_offset, unsigned long
                    *offset_index, int width, int height,
                    int total_blocks, char *mode,
                    int mouse_x, int mouse_y, int action)
@@ -153,7 +156,7 @@ void mouse_clicked(unsigned long *file_offset, unsigned long
    ##                      GENERATE TITLE BAR                         ##
    ##################################################################### */
 
-void generate_titlebar(struct file file_one, struct file file_two,
+static void generate_titlebar(struct file file_one, struct file file_two,
                        unsigned long file_offset, int width, int height,
                        char mode, int display)
 {
@@ -205,7 +208,7 @@ void generate_titlebar(struct file file_one, struct file file_two,
    ##            GENERATE BLOCK DATA FOR OVERVIEW MODE                ##
    ##################################################################### */
 
-char *generate_blocks(struct file file_one, struct file file_two,
+static char *generate_blocks(struct file file_one, struct file file_two,
                  char *block_cache, int total_blocks,
                  unsigned long bytes_per_block,
                  int blocks_with_excess_byte)
@@ -285,9 +288,10 @@ char *generate_blocks(struct file file_one, struct file file_two,
    ##            BLOCK OFFSET FUNCTIONS FOR OVERVIEW MODE             ##
    ##################################################################### */
 
-unsigned long *generate_offsets(unsigned long *offset_index,
-                 int total_blocks, unsigned long bytes_per_block,
-                 int blocks_with_excess_byte)
+static unsigned long *generate_offsets(unsigned long *offset_index,
+                                       int total_blocks,
+                                       unsigned long bytes_per_block,
+                                       int blocks_with_excess_byte)
 {
 	int i;
 	unsigned long offset = 0;
@@ -309,11 +313,11 @@ unsigned long *generate_offsets(unsigned long *offset_index,
 	return offset_index;
 }
 
-unsigned long calculate_offset(unsigned long file_offset,
-				              unsigned long *offset_index, int width,
-				              int total_blocks, int shift_type,
-				              unsigned long largest_file_size,
-				              int rows)
+static unsigned long calculate_offset(unsigned long file_offset,
+                                      unsigned long *offset_index, int width,
+                                      int total_blocks, int shift_type,
+                                      unsigned long largest_file_size,
+                                      int rows)
 {
 
 	/* Initialize variables. */
@@ -389,9 +393,9 @@ static char *getfilename(char *f) {
    ##           DRAW ROWS OF RAW DATA IN HEX/ASCII FORM               ##
    ##################################################################### */
 
-void display_file_names(int row, struct file file_one,
-                        struct file file_two, int offset_char_size,
-                        int offset_jump)
+static void display_file_names(int row, struct file file_one,
+                               struct file file_two, int offset_char_size,
+                               int offset_jump)
 {
 	char *filename_one, *filename_two;
 
@@ -408,8 +412,8 @@ void display_file_names(int row, struct file file_one,
 	attroff(COLOR_PAIR(TITLE_BAR));
 }
 
-void display_offsets(int start_row, int finish_row, int offset_jump,
-	                 int offset_char_size, unsigned long file_offset)
+static void display_offsets(int start_row, int finish_row, int offset_jump,
+                            int offset_char_size, unsigned long file_offset)
 {
 	int i;
 	char offset_line[32];
@@ -424,9 +428,9 @@ void display_offsets(int start_row, int finish_row, int offset_jump,
 	attroff(COLOR_PAIR(TITLE_BAR));
 }
 
-void draw_hex_data(int start_row, int finish_row, struct file file_one,
-                   struct file file_two, unsigned long file_offset,
-                   int offset_char_size, int offset_jump, int display)
+static void draw_hex_data(int start_row, int finish_row, struct file file_one,
+                          struct file file_two, unsigned long file_offset,
+                          int offset_char_size, int offset_jump, int display)
 {
 
 	unsigned long temp_offset = file_offset;
@@ -517,11 +521,10 @@ void draw_hex_data(int start_row, int finish_row, struct file file_one,
    ##              GENERATE SCREEN IN OVERVIEW MODE                   ##
    ##################################################################### */
 
-void generate_overview(struct file file_one, struct file file_two,
-                        unsigned long *file_offset,
-                        int width, int height, char *block_cache,
-                        int total_blocks,
-                        unsigned long *offset_index, int display)
+static void generate_overview(struct file file_one, struct file file_two,
+                              unsigned long *file_offset, int width,
+                              int height, char *block_cache, int total_blocks,
+                              unsigned long *offset_index, int display)
 {
 
 	/* In overview mode:
@@ -607,9 +610,9 @@ void generate_overview(struct file file_one, struct file file_two,
    ##                 GENERATE SCREEN IN HEX MODE                     ##
    ##################################################################### */
 
-void generate_hex(struct file file_one, struct file file_two,
-                  unsigned long *file_offset, int width, int height,
-                  int display)
+static void generate_hex(struct file file_one, struct file file_two,
+                         unsigned long *file_offset, int width, int height,
+                         int display)
 {
 
 	/* In hex mode:
@@ -661,10 +664,10 @@ void generate_hex(struct file file_one, struct file file_two,
    ##                    GENERATE SCREEN VIEW                         ##
    ##################################################################### */
 
-void generate_screen(struct file file_one, struct file file_two, char mode,
-                     unsigned long *file_offset, int width, int height,
-                     char *block_cache, int total_blocks,
-                     unsigned long *offset_index, int display)
+static void generate_screen(struct file file_one, struct file file_two,
+                            char mode, unsigned long *file_offset, int width,
+                            int height, char *block_cache, int total_blocks,
+                            unsigned long *offset_index, int display)
 {
 	/* Clear the window. */
 	erase();
@@ -721,9 +724,8 @@ void start_gui(struct file file_one, struct file file_two,
 	clear();                 /* Clear out the screen */
 
 	/* Calculate values based on window dimensions. */
-	calculate_dimensions(&width, &height, &total_blocks,
-	                     &bytes_per_block, largest_file_size,
-	                     &blocks_with_excess_byte);
+	calculate_dimensions(&width, &height, &total_blocks, &bytes_per_block,
+                            largest_file_size, &blocks_with_excess_byte);
 
 	/* Compile the block/offset cache. The block cache contains an index
 	   of what the general differences are between the two compared
@@ -743,8 +745,7 @@ void start_gui(struct file file_one, struct file file_two,
 	                block_cache, total_blocks, offset_index, display);
 
 	/* Wait for user-keypresses and react accordingly. */
-	for(;;)
-	{
+	for(;;) {
 		int rows;
 
 		/* poll the next keypress event from curses */
@@ -753,10 +754,13 @@ void start_gui(struct file file_one, struct file file_two,
 		/* if we got 'q' or ESC, then quit */
 		if ((key_pressed == 'q') || (key_pressed == 27)) break;
 
-		if (mode == OVERVIEW_MODE) rows = 5; else rows = height - 5;
+		if (mode == OVERVIEW_MODE) {
+			rows = 5;
+		} else {
+			rows = height - 5;
+		}
 
-		switch(key_pressed)
-		{
+		switch (key_pressed) {
 			/* Move left/right/down/up on the blog diagram in overview
 			   mode. */
 
@@ -811,16 +815,16 @@ void start_gui(struct file file_one, struct file file_two,
 				else mode = OVERVIEW_MODE;
 				break;
 			case KEY_MOUSE:
-				if(nc_getmouse(&mouse) == OK) {
+				if (nc_getmouse(&mouse) == OK) {
 
 					/* Left single-click. */
-					if(mouse.bstate & BUTTON1_CLICKED)
+					if (mouse.bstate & BUTTON1_CLICKED)
 						mouse_clicked(&file_offset, offset_index,
 									 width, height, total_blocks, &mode,
 									 mouse.x, mouse.y, BUTTON1_CLICKED);
 
 					/* Left double-click. */
-					if(mouse.bstate & BUTTON1_DOUBLE_CLICKED)
+					if (mouse.bstate & BUTTON1_DOUBLE_CLICKED)
 						mouse_clicked(&file_offset, offset_index,
 								     width, height, total_blocks, &mode,
 								     mouse.x, mouse.y,
