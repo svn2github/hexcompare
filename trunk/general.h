@@ -4,9 +4,9 @@
 #include <stdio.h>
 
 struct file {
-	char *name;           // File name
-	FILE *pointer;        // File descriptor
-	unsigned long size;   // File size
+	char *name;           /* File name       */
+	FILE *pointer;        /* File descriptor */
+	unsigned long size;   /* File size       */
 };
 
 #endif

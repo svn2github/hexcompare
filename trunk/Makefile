@@ -1,6 +1,6 @@
-all: compile
+all: hexcompare
 
-compile:
+hexcompare: main.c gui.c
 	$(CC) $(CFLAGS) -o hexcompare main.c gui.c -lncurses -lm
 
 clean:
