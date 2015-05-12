@@ -13,7 +13,7 @@ static void calculate_dimensions(int *width, int *height, int *total_blocks,
 	getmaxyx(stdscr, *height, *width);
 
 	/* If the window dimensions are too small, exit. */
-	if (*height < 16 || *width < 10) {
+	if ((*height < 16) || (*width < 10)) {
 		endwin();
 		printf("Terminal dimensions are too small to proceed. "
 		       "Increase the size to a minimum of 16w x 10h.\n\n");
@@ -58,49 +58,15 @@ static int calculate_current_block(int total_blocks, unsigned long file_offset,
 	return current_block;
 }
 
-static int calculate_max_offset_characters(unsigned long file_offset,
-                                    int width, int rows)
+/* computes the width of the hex offset margin on the left */
+static int calculate_max_offset_characters(unsigned long filesize1,
+                                           unsigned long filesize2)
 {
-	/* Create variables. */
-	char offset_query[32];
-	char offset_line[32];
-	int offset_size = 0;
-	int previous_size, current_size = 0, i;
-	int redo_loop = 0;
-
-	/* Endless loop until we figure out an offset size that is constant
-	   accross all rows. */
-	for (;;) {
-		unsigned int temp_offset = file_offset;
-
-		/* Calculate offset jump for a given offset_size */
-		int hex_width = width - current_size - 1 - SIDE_MARGIN * 2;
-		int offset_jump = (hex_width - (hex_width % 4)) / 4;
-		offset_size++;
-
-		/* Go row by row. If size increase, recalculate offset jump.
-		   and increase x size. */
-
-		/* Go row by row. */
-		redo_loop = 0;
-		for (i = 0; i < rows; i++) {
-
-			sprintf(offset_query, "0x%%0%ix ", offset_size);
-			sprintf(offset_line, offset_query, temp_offset);
-			current_size = strlen(offset_line);
-
-			if (i > 0 && current_size > previous_size) {
-				redo_loop = 1;
-				break;
-			}
-
-			previous_size = current_size;
-			temp_offset += offset_jump;
-
-		}
-
-		if (redo_loop == 0) return current_size - 3;
-	}
+	unsigned long fsz = filesize1;
+	char s[32];
+	if (filesize2 > filesize1) fsz = filesize2;
+	sprintf(s, "%lX", fsz);
+	return(strlen(s));
 }
 
 /* #####################################################################
@@ -316,8 +282,7 @@ static unsigned long *generate_offsets(unsigned long *offset_index,
 static unsigned long calculate_offset(unsigned long file_offset,
                                       unsigned long *offset_index, int width,
                                       int total_blocks, int shift_type,
-                                      unsigned long largest_file_size,
-                                      int rows)
+                                      unsigned long largest_file_size)
 {
 
 	/* Initialize variables. */
@@ -326,8 +291,8 @@ static unsigned long calculate_offset(unsigned long file_offset,
 	int current_block = 0;
 
 	/* Calculate parameters for the offset. */
-	int offset_char_size = calculate_max_offset_characters(file_offset,
-                                                           width, rows);
+	int offset_char_size = calculate_max_offset_characters(largest_file_size,
+                                                               largest_file_size);
 	int hex_width = width - offset_char_size - 3 - SIDE_MARGIN * 2;
 	int offset_jump = (hex_width - (hex_width % 4)) / 4;
 
@@ -584,8 +549,8 @@ static void generate_overview(struct file file_one, struct file file_two,
 
 	/* Generate the offset markers.
 	   Calculate parameters for the offset. */
-	offset_char_size = calculate_max_offset_characters(*file_offset,
-                                                           width, 5);
+	offset_char_size = calculate_max_offset_characters(file_one.size,
+                                                           file_two.size);
 	hex_width = width - offset_char_size - 3 - SIDE_MARGIN * 2;
 	offset_jump = (hex_width - (hex_width % 4)) / 4;
 
@@ -631,8 +596,8 @@ static void generate_hex(struct file file_one, struct file file_two,
 
 	/* Generate the offset markers.
 	   Calculate parameters for the offset. */
-	int offset_char_size = calculate_max_offset_characters(*file_offset,
-                                              width, height - 5);
+	int offset_char_size = calculate_max_offset_characters(file_one.size,
+                                                               file_two.size);
 	int hex_width = width - offset_char_size - 3 - SIDE_MARGIN * 2;
 	int offset_jump = (hex_width - (hex_width % 4)) / 4;
 
@@ -746,19 +711,11 @@ void start_gui(struct file file_one, struct file file_two,
 
 	/* Wait for user-keypresses and react accordingly. */
 	for(;;) {
-		int rows;
-
 		/* poll the next keypress event from curses */
 		key_pressed = wgetch(main_window);
 
 		/* if we got 'q' or ESC, then quit */
 		if ((key_pressed == 'q') || (key_pressed == 27)) break;
-
-		if (mode == OVERVIEW_MODE) {
-			rows = 5;
-		} else {
-			rows = height - 5;
-		}
 
 		switch (key_pressed) {
 			/* Move left/right/down/up on the blog diagram in overview
@@ -768,43 +725,43 @@ void start_gui(struct file file_one, struct file file_two,
 				if (mode == OVERVIEW_MODE)
 				file_offset = calculate_offset(file_offset,
 				              offset_index, width, total_blocks,
-				              LEFT_BLOCK, largest_file_size, 5);
+				              LEFT_BLOCK, largest_file_size);
 				break;
 			case KEY_RIGHT:
 				if (mode == OVERVIEW_MODE)
 				file_offset = calculate_offset(file_offset,
 				              offset_index, width, total_blocks,
-				              RIGHT_BLOCK, largest_file_size, 5);
+				              RIGHT_BLOCK, largest_file_size);
 				break;
 			case KEY_UP:
 				if (mode == OVERVIEW_MODE)
 				file_offset = calculate_offset(file_offset,
 				              offset_index, width, total_blocks,
-				              UP_ROW, largest_file_size, 5);
+				              UP_ROW, largest_file_size);
 				else if (mode == HEX_MODE)
 				file_offset = calculate_offset(file_offset,
 				              offset_index, width, total_blocks,
-				              UP_LINE, largest_file_size, rows);
+				              UP_LINE, largest_file_size);
 				break;
 			case KEY_DOWN:
 				if (mode == OVERVIEW_MODE)
 				file_offset = calculate_offset(file_offset,
 				              offset_index, width, total_blocks,
-				              DOWN_ROW, largest_file_size, 5);
+				              DOWN_ROW, largest_file_size);
 				else if (mode == HEX_MODE)
 				file_offset = calculate_offset(file_offset,
 				              offset_index, width, total_blocks,
-				              DOWN_LINE, largest_file_size, rows);
+				              DOWN_LINE, largest_file_size);
 				break;
 			case KEY_NPAGE:
 				file_offset = calculate_offset(file_offset,
 				              offset_index, width, total_blocks,
-				              DOWN_LINE, largest_file_size, rows);
+				              DOWN_LINE, largest_file_size);
 				break;
 			case KEY_PPAGE:
 				file_offset = calculate_offset(file_offset,
 				              offset_index, width, total_blocks,
-				              UP_LINE, largest_file_size, rows);
+				              UP_LINE, largest_file_size);
 				break;
 			case 'm':
 				if (display == ASCII_VIEW) display = HEX_VIEW;
