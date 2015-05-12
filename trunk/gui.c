@@ -371,6 +371,20 @@ unsigned long calculate_offset(unsigned long file_offset,
 	return new_offset;
 }
 
+/* returns a pointer to the 'filename' part of a path. One could argue
+ * that basename() would be appropriate here, but the problem is that
+ * some platforms have a basename() that modifies the passed string,
+ * which we want to avoid. */
+static char *getfilename(char *f) {
+	char *res = f;
+	for (; *f != 0; f += 1) {
+		if ((*f == '/') || (*f == '\\')) {
+			res = f + 1;
+		}
+	}
+	return(res);
+}
+
 /* #####################################################################
    ##           DRAW ROWS OF RAW DATA IN HEX/ASCII FORM               ##
    ##################################################################### */
@@ -382,18 +396,8 @@ void display_file_names(int row, struct file file_one,
 	char *filename_one, *filename_two;
 
 	/* ltrim the filenames if any / character is found */
-	filename_one = strrchr(file_one.name, '/');
-	filename_two = strrchr(file_two.name, '/');
-	if (filename_one != NULL) {
-		filename_one += 1;
-	} else {
-		filename_one = file_one.name;
-	}
-	if (filename_two != NULL) {
-		filename_two += 1;
-	} else {
-		filename_two = file_two.name;
-	}
+	filename_one = getfilename(file_one.name);
+	filename_two = getfilename(file_two.name);
 
 	/* Display the file names. */
 	attron(COLOR_PAIR(TITLE_BAR));
