@@ -704,6 +704,11 @@ void start_gui(struct file file_one, struct file file_two,
 
 	/* Initiate the display. */
 	main_window = initscr(); /* Start curses mode. */
+	if (has_colors() != TRUE) {
+		puts("Error: Your terminal do not seem to handle colors.");
+		endwin();
+		return;
+	}
 	start_color();           /* Enable the use of colours. */
 	raw();                   /* Disable line buffering. */
 	noecho();                /* Don't echo while we get characters. */
