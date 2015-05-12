@@ -2,7 +2,7 @@
 #define HEX_GUI
 
 #include <math.h>
-#include <ncurses.h>
+#include <curses.h>
 #include <stdlib.h>
 #include <string.h>
 #include "general.h"
