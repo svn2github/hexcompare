@@ -4,8 +4,8 @@
 
 char *message[] = {
 	"Arguments missing.\n",
-	"Usage:\n  hexcompare file1 file2\n",
-	"File \"%s\" does not exist.\n"
+	"Usage:\n  hexcompare file1 [file2]\n",
+	"Failed to open file \"%s\".\n"
 };
 
 int main(int argc, char **argv)
@@ -15,6 +15,7 @@ int main(int argc, char **argv)
 
 	/* Verify that we have enough input arguments. */
 	if (argc < 2) {
+		puts("hexcompare v" PVER "\n");
 		printf("%s%s", message[0], message[1]);
 		return 1;
 	}
