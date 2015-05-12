@@ -811,7 +811,7 @@ void start_gui(struct file file_one, struct file file_two,
 				else mode = OVERVIEW_MODE;
 				break;
 			case KEY_MOUSE:
-				if(getmouse(&mouse) == OK) {
+				if(nc_getmouse(&mouse) == OK) {
 
 					/* Left single-click. */
 					if(mouse.bstate & BUTTON1_CLICKED)

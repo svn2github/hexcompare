@@ -1,7 +1,6 @@
 #ifndef HEX_GUI
 #define HEX_GUI
 
-#include <math.h>
 #include <curses.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +27,10 @@
 #define RIGHT_BLOCK 1
 #define UP_LINE 3
 #define DOWN_LINE -3
+
+#ifndef nc_getmouse
+#define nc_getmouse getmouse
+#endif
 
 void start_gui(struct file file_one, struct file file_two,
                unsigned long largest_file_size);
