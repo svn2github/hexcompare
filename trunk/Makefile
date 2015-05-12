@@ -1,3 +1,5 @@
+CFLAGS = -O3 -Wall -Wextra -pedantic -Wformat-security -std=gnu89
+
 all: hexcompare
 
 hexcompare: main.c gui.c
