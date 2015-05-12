@@ -667,23 +667,22 @@ void generate_screen(struct file file_one, struct file file_two, char mode,
                      unsigned long *offset_index, int display)
 {
 	/* Clear the window. */
-	clear();
+	erase();
 
 	/* Generate the title bar. */
 	generate_titlebar(file_one, file_two, *file_offset, width, height,
 		          mode, display);
 
 	/* Generate the window contents according to the mode we're in. */
-	if (mode == OVERVIEW_MODE)
+	if (mode == OVERVIEW_MODE) {
 		generate_overview(file_one, file_two, file_offset,
 		                  width, height, block_cache, total_blocks,
 		                  offset_index, display);
 
-	else if (mode == HEX_MODE)
+	} else if (mode == HEX_MODE) {
 		generate_hex(file_one, file_two, file_offset, width, height,
 		             display);
-	return;
-
+	}
 }
 
 /* #####################################################################
@@ -719,6 +718,7 @@ void start_gui(struct file file_one, struct file file_two,
 	keypad(stdscr, TRUE);    /* Enable capture of arrow keys. */
 	curs_set(0);             /* Make the cursor invisible. */
 	mousemask(ALL_MOUSE_EVENTS, NULL); /* Get all mouse events. */
+	clear();                 /* Clear out the screen */
 
 	/* Calculate values based on window dimensions. */
 	calculate_dimensions(&width, &height, &total_blocks,

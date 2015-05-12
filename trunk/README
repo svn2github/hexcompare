@@ -63,7 +63,8 @@ Up/Down can be used to go up/down lines of hex/ASCII data.
 CHANGELOG:
 ----------
 1.0.4   Mateusz Viste contributed several patches that improve portability,
-        remove unnecessary dependencies and fix a few cosmetical issues.
+        remove unnecessary dependencies and fix a few cosmetical issues, also
+        fixed a flicker issue reported by Rene Liebscher.
 1.0.3   Tomasz Wasilczyk contributed numerous fixes to correct eroneous
         comparisons, compiler warnings and build issues.
 1.0.2   More efficient byte comparison scheme.
