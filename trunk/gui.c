@@ -447,7 +447,7 @@ static void draw_hex_data(int start_row, int finish_row, struct file file_one,
 				colour_pair = BLOCK_EMPTY;
 			} else if (bytes_read_two == 0) {
 				colour_pair = BLOCK_DIFFERENT;
-			} else if (strcmp(byte_one_hex, byte_two_hex) == 0) {
+			} else if (byte_one == byte_two) {
 				colour_pair = BLOCK_SAME;
 			} else {
 				colour_pair = BLOCK_DIFFERENT;
@@ -470,7 +470,7 @@ static void draw_hex_data(int start_row, int finish_row, struct file file_one,
 				colour_pair = BLOCK_EMPTY;
 			} else if (bytes_read_one == 0) {
 				colour_pair = BLOCK_DIFFERENT;
-			} else if (strcmp(byte_one_hex,byte_two_hex) == 0) {
+			} else if (byte_one == byte_two) {
 				colour_pair = BLOCK_SAME;
 			} else {
 				colour_pair = BLOCK_DIFFERENT;
