@@ -2,16 +2,16 @@
 #include "general.h"
 #include "gui.h"
 
-char *message[] = {
-	"Arguments missing.\n",
-	"Usage:\n  hexcompare file1 [file2]\n",
-	"Failed to open file \"%s\".\n"
-};
 
 int main(int argc, char **argv)
 {
 	struct file file_one, file_two;
 	unsigned long largest_file_size;
+	char *message[] = {
+		"Arguments missing.\n",
+		"Usage:\n  hexcompare file1 [file2]\n",
+		"Failed to open file \"%s\".\n"
+	};
 
 	/* Verify that we have enough input arguments. */
 	if (argc < 2) {
