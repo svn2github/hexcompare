@@ -63,7 +63,7 @@ int calculate_max_offset_characters(unsigned long file_offset,
 	char offset_line[32];
 	int offset_size = 0;
 	int previous_size, current_size = 0, i;
-	int redo_loop = false;
+	int redo_loop = 0;
 
 	/* Endless loop until we figure out an offset size that is constant
 	   accross all rows. */
@@ -79,7 +79,7 @@ int calculate_max_offset_characters(unsigned long file_offset,
 		   and increase x size. */
 
 		/* Go row by row. */
-		redo_loop = false;
+		redo_loop = 0;
 		for (i = 0; i < rows; i++) {
 
 			sprintf(offset_query, "0x%%0%ix ", offset_size);
@@ -87,7 +87,7 @@ int calculate_max_offset_characters(unsigned long file_offset,
 			current_size = strlen(offset_line);
 
 			if (i > 0 && current_size > previous_size) {
-				redo_loop = true;
+				redo_loop = 1;
 				break;
 			}
 
@@ -96,8 +96,7 @@ int calculate_max_offset_characters(unsigned long file_offset,
 
 		}
 
-		if (redo_loop == false)
-			return current_size - 3;
+		if (redo_loop == 0) return current_size - 3;
 	}
 }
 
@@ -430,7 +429,7 @@ void draw_hex_data(int start_row, int finish_row, struct file file_one,
 	int i, j;
 
 	for (i = start_row; i < finish_row; i++) {
-		bool bold = false;
+		int bold = 0;
 		for (j = SIDE_MARGIN+offset_char_size+3; j <
 			SIDE_MARGIN+offset_char_size+offset_jump*2+1; j += 2) {
 			int colour_pair;
@@ -457,7 +456,7 @@ void draw_hex_data(int start_row, int finish_row, struct file file_one,
 			byte_two_ascii = raw_to_ascii(byte_two);
 
 			/* Make every other byte bold. */
-			if (bold == true) attron(A_BOLD);
+			if (bold != 0) attron(A_BOLD);
 
 			/* Post results. */
 
@@ -500,12 +499,8 @@ void draw_hex_data(int start_row, int finish_row, struct file file_one,
 			attroff(COLOR_PAIR(colour_pair));
 
 			/* Switch bold characters with non-bold characters. */
-			if (bold == true) {
-				attroff(A_BOLD);
-				bold = false;
-			} else {
-				bold = true;
-			}
+			if (bold != 0) attroff(A_BOLD);
+			bold ^= 1;
 
 			temp_offset++;
 		}
