@@ -840,6 +840,8 @@ void start_gui(struct file *file_one, struct file *file_two,
 	}
 
 	/* End curses mode and exit. */
+	clear();
+	refresh();
 	endwin();
 	free(block_cache);
 	return;
