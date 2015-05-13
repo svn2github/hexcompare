@@ -43,6 +43,10 @@
 #define UP_LINE 3
 #define DOWN_LINE -3
 
+/* hexcompare uses an ncurses-style mouse API incompatible with pdcurses. but
+ * pdcurses provides a compatibility wrapper called nc_getmouse(), so here I
+ * check if it exists, and if not, I define it to point to getmouse(),
+ * assuming that I run with ncurses. */
 #ifndef nc_getmouse
 #define nc_getmouse getmouse
 #endif
