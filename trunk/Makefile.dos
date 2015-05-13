@@ -12,6 +12,7 @@ all: hexcomp.exe
 
 hexcomp.exe: main.c gui.c
 	$(CC) $(CFLAGS) -o hexcomp.exe main.c gui.c -l:pdcurses.a
+	upx -9 hexcomp.exe
 
 clean:
 	del hexcomp.exe
