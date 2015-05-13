@@ -392,7 +392,7 @@ static void display_offsets(int start_row, int finish_row, int offset_jump,
 	for (i = start_row; i < finish_row; i++) {
 		sprintf(offset_line, "0x%%0%ix ", offset_char_size);
 		mvprintw(i, SIDE_MARGIN, offset_line, temp_offset);
-		temp_offset += offset_jump;
+		temp_offset += offset_jump - 1;
 	}
 	attroff(COLOR_PAIR(TITLE_BAR));
 }
