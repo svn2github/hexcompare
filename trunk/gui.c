@@ -226,6 +226,7 @@ static char *generate_blocks(struct file *file_one, struct file *file_two,
 
 		/* Stop here if we read 0 bytes. Both files are fully read. */
 		if (bytes_read_one == 0 && bytes_read_two == 0) {
+			block_cache[i] = BLOCK_EMPTY;
 			break;
 		}
 
