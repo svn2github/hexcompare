@@ -32,7 +32,7 @@
 #define nc_getmouse getmouse
 #endif
 
-void start_gui(struct file file_one, struct file file_two,
+void start_gui(struct file *file_one, struct file *file_two,
                unsigned long largest_file_size);
 
 #endif

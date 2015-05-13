@@ -122,7 +122,7 @@ static void mouse_clicked(unsigned long *file_offset, unsigned long
    ##                      GENERATE TITLE BAR                         ##
    ##################################################################### */
 
-static void generate_titlebar(struct file file_one, struct file file_two,
+static void generate_titlebar(struct file *file_one, struct file *file_two,
                        unsigned long file_offset, int width, int height,
                        char mode, int display)
 {
@@ -142,7 +142,7 @@ static void generate_titlebar(struct file file_one, struct file file_two,
 
 	/* Create the title. */
 	mvprintw(0, SIDE_MARGIN, "hexcompare: %s vs. %s",
-	         file_one.name, file_two.name);
+	         file_one->name, file_two->name);
 
 	/* Indicate file offset. */
 	sprintf(title_offset, " 0x%04x", (unsigned int) file_offset);
@@ -176,7 +176,7 @@ static void generate_titlebar(struct file file_one, struct file file_two,
    ##            GENERATE BLOCK DATA FOR OVERVIEW MODE                ##
    ##################################################################### */
 
-static char *generate_blocks(struct file file_one, struct file file_two,
+static char *generate_blocks(struct file *file_one, struct file *file_two,
                  char *block_cache, int total_blocks,
                  unsigned long bytes_per_block,
                  int blocks_with_excess_byte)
@@ -195,8 +195,8 @@ static char *generate_blocks(struct file file_one, struct file file_two,
 	memset(block_cache, BLOCK_EMPTY, total_blocks);
 
 	/* Seek to start of file. */
-	fseek(file_one.pointer, 0, SEEK_SET);
-	fseek(file_two.pointer, 0, SEEK_SET);
+	fseek(file_one->pointer, 0, SEEK_SET);
+	fseek(file_two->pointer, 0, SEEK_SET);
 
 	/* Compare bytes of file_one with file_two. Store results in */
 	/* a dynamically-sized block_cache. */
@@ -220,9 +220,9 @@ static char *generate_blocks(struct file file_one, struct file file_two,
 
 		/* Read in the next block of data. */
 		bytes_read_one = fread(block_one, bytes_in_block,
-		                           1, file_one.pointer);
+		                           1, file_one->pointer);
 		bytes_read_two = fread(block_two, bytes_in_block,
-		                           1, file_two.pointer);
+		                           1, file_two->pointer);
 
 		/* Stop here if we read 0 bytes. Both files are fully read. */
 		if (bytes_read_one == 0 && bytes_read_two == 0) {
@@ -365,15 +365,15 @@ static char *getfilename(char *f) {
    ##           DRAW ROWS OF RAW DATA IN HEX/ASCII FORM               ##
    ##################################################################### */
 
-static void display_file_names(int row, struct file file_one,
-                               struct file file_two, int offset_char_size,
+static void display_file_names(int row, struct file *file_one,
+                               struct file *file_two, int offset_char_size,
                                int offset_jump)
 {
 	char *filename_one, *filename_two;
 
 	/* ltrim the filenames if any / character is found */
-	filename_one = getfilename(file_one.name);
-	filename_two = getfilename(file_two.name);
+	filename_one = getfilename(file_one->name);
+	filename_two = getfilename(file_two->name);
 
 	/* Display the file names. */
 	attron(COLOR_PAIR(TITLE_BAR));
@@ -400,8 +400,8 @@ static void display_offsets(int start_row, int finish_row, int offset_jump,
 	attroff(COLOR_PAIR(TITLE_BAR));
 }
 
-static void draw_hex_data(int start_row, int finish_row, struct file file_one,
-                          struct file file_two, unsigned long file_offset,
+static void draw_hex_data(int start_row, int finish_row, struct file *file_one,
+                          struct file *file_two, unsigned long file_offset,
                           int offset_char_size, int offset_jump, int display)
 {
 
@@ -419,12 +419,12 @@ static void draw_hex_data(int start_row, int finish_row, struct file file_one,
 			int bytes_read_one, bytes_read_two;
 
 			/* Seek to the proper locations in the file. */
-			fseek(file_one.pointer, temp_offset, SEEK_SET);
-			fseek(file_two.pointer, temp_offset, SEEK_SET);
+			fseek(file_one->pointer, temp_offset, SEEK_SET);
+			fseek(file_two->pointer, temp_offset, SEEK_SET);
 
 			/* Read a byte from the files. */
-			bytes_read_one = fread(&byte_one, 1, 1, file_one.pointer);
-			bytes_read_two = fread(&byte_two, 1, 1, file_two.pointer);
+			bytes_read_one = fread(&byte_one, 1, 1, file_one->pointer);
+			bytes_read_two = fread(&byte_two, 1, 1, file_two->pointer);
 
 			/* Convert binary to ASCII hex. */
 			sprintf(byte_one_hex, "%02x", byte_one);
@@ -502,7 +502,7 @@ static void draw_hex_data(int start_row, int finish_row, struct file file_one,
    ##              GENERATE SCREEN IN OVERVIEW MODE                   ##
    ##################################################################### */
 
-static void generate_overview(struct file file_one, struct file file_two,
+static void generate_overview(struct file *file_one, struct file *file_two,
                               unsigned long *file_offset, int width,
                               int height, char *block_cache, int total_blocks,
                               unsigned long *offset_index, int display)
@@ -565,8 +565,8 @@ static void generate_overview(struct file file_one, struct file file_two,
 
 	/* Generate the offset markers.
 	   Calculate parameters for the offset. */
-	offset_char_size = calculate_max_offset_characters(file_one.size,
-                                                           file_two.size);
+	offset_char_size = calculate_max_offset_characters(file_one->size,
+                                                           file_two->size);
 	hex_width = width - offset_char_size - 3 - SIDE_MARGIN * 2;
 	offset_jump = (hex_width - (hex_width % 4)) / 4;
 
@@ -591,7 +591,7 @@ static void generate_overview(struct file file_one, struct file file_two,
    ##                 GENERATE SCREEN IN HEX MODE                     ##
    ##################################################################### */
 
-static void generate_hex(struct file file_one, struct file file_two,
+static void generate_hex(struct file *file_one, struct file *file_two,
                          unsigned long *file_offset, int width, int height,
                          int display)
 {
@@ -612,8 +612,8 @@ static void generate_hex(struct file file_one, struct file file_two,
 
 	/* Generate the offset markers.
 	   Calculate parameters for the offset. */
-	int offset_char_size = calculate_max_offset_characters(file_one.size,
-                                                               file_two.size);
+	int offset_char_size = calculate_max_offset_characters(file_one->size,
+                                                               file_two->size);
 	int hex_width = width - offset_char_size - 3 - SIDE_MARGIN * 2;
 	int offset_jump = (hex_width - (hex_width % 4)) / 4;
 
@@ -645,7 +645,7 @@ static void generate_hex(struct file file_one, struct file file_two,
    ##                    GENERATE SCREEN VIEW                         ##
    ##################################################################### */
 
-static void generate_screen(struct file file_one, struct file file_two,
+static void generate_screen(struct file *file_one, struct file *file_two,
                             char mode, unsigned long *file_offset, int width,
                             int height, char *block_cache, int total_blocks,
                             unsigned long *offset_index, int display)
@@ -673,7 +673,7 @@ static void generate_screen(struct file file_one, struct file file_two,
    ##                       MAIN FUNCTION                             ##
    ##################################################################### */
 
-void start_gui(struct file file_one, struct file file_two,
+void start_gui(struct file *file_one, struct file *file_two,
                unsigned long largest_file_size)
 {
 	/* Initiate variables */

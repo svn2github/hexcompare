@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 	                    : file_two.size;
 
 	/* Initiate the GUI display. */
-	start_gui(file_one, file_two, largest_file_size);
+	start_gui(&file_one, &file_two, largest_file_size);
 
 	/* Close the files. */
 	fclose(file_one.pointer);
