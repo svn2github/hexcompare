@@ -59,12 +59,9 @@ static int calculate_current_block(int total_blocks, unsigned long file_offset,
 }
 
 /* computes the width of the hex offset margin on the left */
-static int calculate_max_offset_characters(unsigned long filesize1,
-                                           unsigned long filesize2)
+static int calculate_max_offset_characters(unsigned long fsz)
 {
-	unsigned long fsz = filesize1;
 	char s[32];
-	if (filesize2 > filesize1) fsz = filesize2;
 	sprintf(s, "%lX", fsz);
 	return(strlen(s));
 }
@@ -298,8 +295,7 @@ static unsigned long calculate_offset(unsigned long file_offset,
 	int current_block = 0;
 
 	/* Calculate parameters for the offset. */
-	int offset_char_size = calculate_max_offset_characters(largest_file_size,
-                                                               largest_file_size);
+	int offset_char_size = calculate_max_offset_characters(largest_file_size);
 	int hex_width = width - offset_char_size - 3 - SIDE_MARGIN * 2;
 	int offset_jump = (hex_width - (hex_width % 4)) / 4;
 
@@ -506,7 +502,8 @@ static void draw_hex_data(int start_row, int finish_row, struct file *file_one,
 static void generate_overview(struct file *file_one, struct file *file_two,
                               unsigned long *file_offset, int width,
                               int height, char *block_cache, int total_blocks,
-                              unsigned long *offset_index, int display)
+                              unsigned long *offset_index, int display,
+                              unsigned long largest_file_size)
 {
 
 	/* In overview mode:
@@ -566,8 +563,7 @@ static void generate_overview(struct file *file_one, struct file *file_two,
 
 	/* Generate the offset markers.
 	   Calculate parameters for the offset. */
-	offset_char_size = calculate_max_offset_characters(file_one->size,
-                                                           file_two->size);
+	offset_char_size = calculate_max_offset_characters(largest_file_size);
 	hex_width = width - offset_char_size - 3 - SIDE_MARGIN * 2;
 	offset_jump = (hex_width - (hex_width % 4)) / 4;
 
@@ -594,7 +590,7 @@ static void generate_overview(struct file *file_one, struct file *file_two,
 
 static void generate_hex(struct file *file_one, struct file *file_two,
                          unsigned long *file_offset, int width, int height,
-                         int display)
+                         int display, unsigned long largest_file_size)
 {
 
 	/* In hex mode:
@@ -613,8 +609,7 @@ static void generate_hex(struct file *file_one, struct file *file_two,
 
 	/* Generate the offset markers.
 	   Calculate parameters for the offset. */
-	int offset_char_size = calculate_max_offset_characters(file_one->size,
-                                                               file_two->size);
+	int offset_char_size = calculate_max_offset_characters(largest_file_size);
 	int hex_width = width - offset_char_size - 3 - SIDE_MARGIN * 2;
 	int offset_jump = (hex_width - (hex_width % 4)) / 4;
 
@@ -649,7 +644,8 @@ static void generate_hex(struct file *file_one, struct file *file_two,
 static void generate_screen(struct file *file_one, struct file *file_two,
                             char mode, unsigned long *file_offset, int width,
                             int height, char *block_cache, int total_blocks,
-                            unsigned long *offset_index, int display)
+                            unsigned long *offset_index, int display,
+                            unsigned long largest_file_size)
 {
 	/* Clear the window. */
 	erase();
@@ -662,11 +658,11 @@ static void generate_screen(struct file *file_one, struct file *file_two,
 	if (mode == OVERVIEW_MODE) {
 		generate_overview(file_one, file_two, file_offset,
 		                  width, height, block_cache, total_blocks,
-		                  offset_index, display);
+		                  offset_index, display, largest_file_size);
 
 	} else if (mode == HEX_MODE) {
 		generate_hex(file_one, file_two, file_offset, width, height,
-		             display);
+		             display, largest_file_size);
 	}
 }
 
@@ -724,7 +720,8 @@ void start_gui(struct file *file_one, struct file *file_two,
 
 	/* Generate initial screen contents. */
 	generate_screen(file_one, file_two, mode, &file_offset, width, height,
-	                block_cache, total_blocks, offset_index, display);
+	                block_cache, total_blocks, offset_index, display,
+                        largest_file_size);
 
 	/* Wait for user-keypresses and react accordingly. */
 	for(;;) {
@@ -824,7 +821,7 @@ void start_gui(struct file *file_one, struct file *file_two,
 
 		generate_screen(file_one, file_two, mode, &file_offset, width,
 	                        height, block_cache, total_blocks,
-                                offset_index, display);
+                                offset_index, display, largest_file_size);
 	}
 
 	/* End curses mode and exit. */
