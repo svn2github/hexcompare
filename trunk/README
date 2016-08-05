@@ -18,7 +18,11 @@ LICENSE:
 HOW TO COMPILE:
 ---------------
   Enter the "make" command in your terminal, minus the quote. It will produce
-an executable called "hexcompare". This is our program.
+an executable called "hexcompare". This is our program. hexcompare requires
+a compliant C compiler with a curses library. So far, it has been successfully
+built with:
+ - ncurses v5.9 on GCC 4.8.5 (Linux)
+ - pdcurses v1.295 on DJGPP v2.04 (DOS)
 
 
 HOW TO INTERPRET:
